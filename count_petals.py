@@ -151,9 +151,7 @@ if __name__ == "__main__":
                 exit()
 
         if len(sys.argv) >= 4:
-            print(sys.argv[3])
             visualize = sys.argv[3].lower() == "true"
-            print(visualize)
 
         if len(sys.argv) == 5:
             compare_file = sys.argv[4]
@@ -178,30 +176,19 @@ if __name__ == "__main__":
                         print("Unable to count petals.")
 
             if compare_file is not None:
-                # compare the output file to the compare file
                 # Read the CSV files
                 df1 = pd.read_csv(output_file)
                 df2 = pd.read_csv(compare_file)
 
-                print("TEST")
-                print(df1.head())
-                print(df2.head())
-
-                
-
                 # Merge the dataframes based on the shared column name
                 # Merge is creating duplicate rows, why?
                 merged_df = pd.merge(df1, df2, on='file').drop_duplicates()
-
-                print(merged_df.head())
 
                 # Create a scatter plot
                 plt.scatter(merged_df['manual_count'], merged_df['auto_count'])
                 plt.xlabel('manual')
                 plt.ylabel('automated')
                 plt.title('Petal Counts')
-
-                
 
                 # Save the scatter plot to a file
                 if not os.path.exists('visualizations'):
