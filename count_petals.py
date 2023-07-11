@@ -20,8 +20,6 @@ def verify_image(filepath):
         return False
 
 def count_petals(filepath,visualize=False):
-    print("Visualize?")
-    print(visualize)
     # load image
     img = cv2.imread(filepath) # read in the image
     orig_rgb = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB)) # convert it from BGR to RGB (used for visualization)
@@ -167,13 +165,14 @@ if __name__ == "__main__":
                 print("Unable to count petals.")
 
         elif os.path.isdir(filepath):
-            for file in os.listdir(filepath):
-                if file.endswith(".jpg") or file.endswith(".png"):
-                    num_petals = count_petals(os.path.join(filepath, file), visualize)
-                    if num_petals is not None:
-                        write_csv(file, output_file, num_petals)
-                    else:
-                        print("Unable to count petals.")
+            for root, dirs, files in os.walk(filepath):
+                for file in files:
+                    if file.endswith(".jpg") or file.endswith(".png"):
+                        num_petals = count_petals(os.path.join(root, file), visualize)
+                        if num_petals is not None:
+                            write_csv(file, output_file, num_petals)
+                        else:
+                            print("Unable to count petals.")
 
             if compare_file is not None:
                 # Read the CSV files
