@@ -20,6 +20,8 @@ def verify_image(filepath):
         return False
 
 def count_petals(filepath,visualize=False):
+    print("Visualize?")
+    print(visualize)
     # load image
     img = cv2.imread(filepath) # read in the image
     orig_rgb = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB)) # convert it from BGR to RGB (used for visualization)
@@ -148,8 +150,10 @@ if __name__ == "__main__":
                 print('output_file must be a csv')
                 exit()
 
-        if len(sys.argv) == 4:
+        if len(sys.argv) >= 4:
+            print(sys.argv[3])
             visualize = sys.argv[3].lower() == "true"
+            print(visualize)
 
         if len(sys.argv) == 5:
             compare_file = sys.argv[4]
@@ -186,7 +190,10 @@ if __name__ == "__main__":
                 
 
                 # Merge the dataframes based on the shared column name
-                merged_df = pd.merge(df1, df2, on='file')
+                # Merge is creating duplicate rows, why?
+                merged_df = pd.merge(df1, df2, on='file').drop_duplicates()
+
+                print(merged_df.head())
 
                 # Create a scatter plot
                 plt.scatter(merged_df['manual_count'], merged_df['auto_count'])
@@ -194,7 +201,7 @@ if __name__ == "__main__":
                 plt.ylabel('automated')
                 plt.title('Petal Counts')
 
-                plt.show()
+                
 
                 # Save the scatter plot to a file
                 if not os.path.exists('visualizations'):
