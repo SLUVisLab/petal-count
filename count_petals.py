@@ -8,6 +8,7 @@ from scipy import ndimage
 import unionfind as UF
 import utils
 import csv
+import pandas as pd
 
 def verify_image(filepath):
     try:
@@ -128,16 +129,17 @@ def write_csv(filepath, output_file, num_petals):
     else:
         with open(output_file, "w", newline="") as csvfile:
             writer = csv.writer(csvfile)
-            writer.writerow(["filepath", "num_petals"])
+            writer.writerow(["file", "auto_count"])
             writer.writerow([filepath, num_petals])
 
 if __name__ == "__main__":
     import sys
     if len(sys.argv) < 2:
-        print("Usage: python count_petals.py <filepath> [output_file] [visualize]")
+        print("Usage: python count_petals.py <filepath> [output_file] [visualize] [compare_file]")
     else:
         filepath = sys.argv[1]
         output_file = './petal_counts.csv'
+        compare_file = None
         visualize = True
 
         if len(sys.argv) >= 3:
@@ -148,6 +150,12 @@ if __name__ == "__main__":
 
         if len(sys.argv) == 4:
             visualize = sys.argv[3].lower() == "true"
+
+        if len(sys.argv) == 5:
+            compare_file = sys.argv[4]
+            if not '.csv' in compare_file:
+                print('compare_file must be a csv')
+                exit()
 
         if os.path.isfile(filepath):
             num_petals = count_petals(filepath, visualize)
@@ -161,8 +169,40 @@ if __name__ == "__main__":
                 if file.endswith(".jpg") or file.endswith(".png"):
                     num_petals = count_petals(os.path.join(filepath, file), visualize)
                     if num_petals is not None:
-                        write_csv(os.path.join(filepath, file), output_file, num_petals)
+                        write_csv(file, output_file, num_petals)
                     else:
                         print("Unable to count petals.")
+
+            if compare_file is not None:
+                # compare the output file to the compare file
+                # Read the CSV files
+                df1 = pd.read_csv(output_file)
+                df2 = pd.read_csv(compare_file)
+
+                print("TEST")
+                print(df1.head())
+                print(df2.head())
+
+                
+
+                # Merge the dataframes based on the shared column name
+                merged_df = pd.merge(df1, df2, on='file')
+
+                # Create a scatter plot
+                plt.scatter(merged_df['manual_count'], merged_df['auto_count'])
+                plt.xlabel('manual')
+                plt.ylabel('automated')
+                plt.title('Petal Counts')
+
+                # Save the scatter plot to a file
+                if not os.path.exists('visualizations'):
+                    os.makedirs('visualizations')
+
+                visualization_file = os.path.join('visualizations',os.path.basename('scatter_plot.png'))
+                plt.savefig(visualization_file)
+
+
+
+
         else:
             print("Invalid file path.")
