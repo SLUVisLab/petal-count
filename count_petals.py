@@ -194,6 +194,8 @@ if __name__ == "__main__":
                 plt.ylabel('automated')
                 plt.title('Petal Counts')
 
+                plt.show()
+
                 # Save the scatter plot to a file
                 if not os.path.exists('visualizations'):
                     os.makedirs('visualizations')
